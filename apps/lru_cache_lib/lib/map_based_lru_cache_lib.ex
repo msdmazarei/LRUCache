@@ -57,40 +57,49 @@ defmodule MapBasedLruCacheLib do
 
   @behaviour LruCacheLib
 
+  @doc ~S"""
+
+  returns new struct with passed capacity
+
+  ## Examples
+        iex> MapBasedLruCacheLib.new_instance(10)
+        %MapBasedLruCacheLib{access_counter: 0,capacity: 10,counter_key_map: %{},hash_map: %{},key_counter_map: %{},size: 0}
+  """
   @spec new_instance(integer) :: map_based_lru_cache()
   @impl true
-  def new_instance(capacity) do
+  def new_instance(capacity)
+      when is_integer(capacity) and capacity > 0 do
+    %__MODULE__{capacity: capacity}
+  end
+
+  @spec put(map_based_lru_cache(), String.t(), any) :: map_based_lru_cache()
+  @impl true
+  def put(map_based_lru_cache = %__MODULE__{}, key, value) do
     # TODO: implement this
   end
 
-  @spec put(maped_based_lru_cache(), String.t(), any) :: maped_based_lru_cache()
+  @spec delete(map_based_lru_cache(), String.t()) :: map_based_lru_cache()
   @impl true
-  def put(maped_based_lru_cache = %__MODULE__{}, key, value) do
+  def delete(map_based_lru_cache = %__MODULE__{}, key) do
     # TODO: implement this
   end
 
-  @spec delete(maped_based_lru_cache(), String.t()) :: maped_based_lru_cache()
+  @spec get(map_based_lru_cache(), String.t()) ::
+          {false, nil, map_based_lru_cache()} | {true, any, map_based_lru_cache()}
   @impl true
-  def delete(maped_based_lru_cache = %__MODULE__{}, key) do
+  def get(map_based_lru_cache = %__MODULE__{}, key) do
     # TODO: implement this
   end
 
-  @spec get(maped_based_lru_cache(), String.t()) ::
-          {false, nil, maped_based_lru_cache()} | {true, any, maped_based_lru_cache()}
+  @spec size(map_based_lru_cache()) :: integer
   @impl true
-  def get(maped_based_lru_cache = %__MODULE__{}, key) do
+  def size(map_based_lru_cache = %__MODULE__{}) do
     # TODO: implement this
   end
 
-  @spec size(maped_based_lru_cache()) :: integer
+  @spec capacity(map_based_lru_cache()) :: integer
   @impl true
-  def size(maped_based_lru_cache = %__MODULE__{}) do
-    # TODO: implement this
-  end
-
-  @spec capacity(maped_based_lru_cache()) :: integer
-  @impl true
-  def capacity(maped_based_lru_cache = %__MODULE__{}) do
+  def capacity(map_based_lru_cache = %__MODULE__{}) do
     # TODO: implement this
   end
 end
