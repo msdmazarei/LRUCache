@@ -199,6 +199,12 @@ defmodule SimpleLruCacheLib do
         ...>        |> SimpleLruCacheLib.put("a","a")
         %SimpleLruCacheLib{capacity: 5, hash_map: %{"a" => "a", "b" => "b" }, lru: ["a","b"], size: 2}
 
+        iex> SimpleLruCacheLib.new_instance(5) |> SimpleLruCacheLib.put("a","a")
+        ...> |> SimpleLruCacheLib.put("a","b")
+        ...> |> SimpleLruCacheLib.get("a")
+        ...> |> Tuple.to_list |> Enum.at(1)
+        "b"
+
   """
   @spec put(simple_lru_cache(), String.t(), any) :: simple_lru_cache()
   @impl true
@@ -210,7 +216,12 @@ defmodule SimpleLruCacheLib do
         value
       ) do
     if hash_map |> Map.has_key?(key) do
-      update_key_part(simple_lru_cache, key)
+      simple_lru_cache = update_key_part(simple_lru_cache, key)
+
+      %{
+        simple_lru_cache
+        | hash_map: hash_map |> Map.put(key, value)
+      }
     else
       put_new_key(simple_lru_cache, key, value)
     end
