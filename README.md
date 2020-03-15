@@ -5,8 +5,14 @@ to know more about LRU cache see https://en.wikipedia.org/wiki/Cache_replacement
 
 the simplest way to implement LRU is using LinkedList (to store Least recently Keys) and HashMap to Store Key-Value. implementing is challenge in Erlang/Elixir starts because they do not support LinkedList Structure. 
 
-# TODO
-## Impelementing LRU Cache
-## Develop REST API
-## Distributed System
+# Project Structure
+we have two apps in this repo, 
+* - lru_cache_lib wich contains two diffrent implementation of LRUCache based on diffrent concepts, algorithm in each module will describe how module works, 
+* - web_api which suppots REST API
 
+## web_api 
+in web_api we have two folder "web_api" and "lru_cache". lru_cache prepare LruCacheLib functionality to use in web_api, it defines GenServer and some apis to work with GenServer and also WebApi.LruCache.Distributed modules make it distributable
+
+to config web_api to use which algorithm and how many capacity our cache should have use config ( check dev.exs file to change `cache_impl_module_name` and `cache_capacity`)
+
+# TODO: add logs in project!!!
