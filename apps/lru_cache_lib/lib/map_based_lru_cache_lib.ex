@@ -91,15 +91,38 @@ defmodule MapBasedLruCacheLib do
     # TODO: implement this
   end
 
+  @doc ~S"""
+  returns cache actual size
+
+  ## Examples
+
+    iex> MapBasedLruCacheLib.new_instance(10) |> MapBasedLruCacheLib.size()
+    0
+
+    iex> MapBasedLruCacheLib.new_instance(10) |> MapBasedLruCacheLib.put("a","a") |> MapBasedLruCacheLib.size
+    1
+  """
   @spec size(map_based_lru_cache()) :: integer
   @impl true
-  def size(map_based_lru_cache = %__MODULE__{}) do
-    # TODO: implement this
+  def size(map_based_lru_cache = %__MODULE__{size: size}) do
+    size
   end
 
+  @doc ~S"""
+  returns cache capacity
+
+  ## Examples
+    iex> MapBasedLruCacheLib.new_instance(5) |> MapBasedLruCacheLib.capacity
+    5
+
+    iex> MapBasedLruCacheLib.new_instance(10) |> MapBasedLruCacheLib.capacity
+    10
+  """
   @spec capacity(map_based_lru_cache()) :: integer
   @impl true
-  def capacity(map_based_lru_cache = %__MODULE__{}) do
-    # TODO: implement this
+  def capacity(map_based_lru_cache = %__MODULE__{
+    capacity: capacity
+  }) do
+    capacity
   end
 end
