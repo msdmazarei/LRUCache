@@ -2,6 +2,8 @@ defmodule WebApi.LruCacheController do
   use WebApi, :controller
   import Phoenix.Controller
 
+  # to switch to distrubuted mode simple change WebApi.LruCache
+  # to WebApi.LruCache.Distributed
   @lru_cache_module WebApi.LruCache
 
   @doc ~S"""
