@@ -36,3 +36,7 @@ config :web_api, WebApi.Endpoint,
 # If desired, both `http:` and `https:` keys can be
 # configured to run both http and https servers on
 # different ports.
+config :web_api, WebApi.LruCache.GServer,
+  cache_impl_module_name: SimpleLruCacheLib,
+  cache_capacity: 6
+
