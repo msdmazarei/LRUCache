@@ -72,16 +72,103 @@ defmodule MapBasedLruCacheLib do
     %__MODULE__{capacity: capacity}
   end
 
+  @doc ~S"""
+    update cache by provied key, value
+
+    ## Algorithm
+      if size < capacity:
+        if key in HashMap:
+          inc access_counter
+          update key_counter_map and set new access counter
+          delete old counter value from counter_key_map
+          add new counter value to counter_key_map
+          update hashmap with new value
+        else:
+          inc access_counter
+          update key_counter_map, counter_key_map with access_counter, key
+          add key,value to HashMap
+      else:
+        if key in HashMap:
+           inc access_counter
+           update key_counter_map and set new access counter
+           delete old counter value from counter_key_map
+           add new counter value to counter_key_map
+           update hashmap with new value
+        else:
+          get keys of counter_key_map as list and pick first key from list
+
+          delete selected counter and passed key from key_counter_map, counter_key_map and hash_map
+          add key, value to cache
+
+    ## Examples
+        iex> MapBasedLruCacheLib.new_instance(5) |> MapBasedLruCacheLib.put("a","a")
+        %MapBasedLruCacheLib{access_counter: 1,capacity: 5,counter_key_map: %{1 => "a"},hash_map: %{"a" => "a"},key_counter_map: %{"a" => 1},size: 1}
+
+        iex> MapBasedLruCacheLib.new_instance(5) |> MapBasedLruCacheLib.put("a","a") |> MapBasedLruCacheLib.put("b","b")
+        %MapBasedLruCacheLib{access_counter: 2,capacity: 5,counter_key_map: %{1 => "a", 2 => "b"},hash_map: %{"a" => "a", "b" => "b"},key_counter_map: %{"a" => 1, "b" => 2},size: 2}
+
+        iex>  MapBasedLruCacheLib.new_instance(5)
+        ...>        |> MapBasedLruCacheLib.put("a","a")
+        ...>        |> MapBasedLruCacheLib.put("b","b")
+        ...>        |> MapBasedLruCacheLib.put("a","a")
+        %MapBasedLruCacheLib{access_counter: 3,capacity: 5,counter_key_map: %{2 => "b", 3 => "a"},hash_map: %{"a" => "a", "b" => "b"},key_counter_map: %{"a" => 3, "b" => 2},size: 2}
+
+
+        iex> MapBasedLruCacheLib.new_instance(5) |> MapBasedLruCacheLib.put("a","a")
+        ...> |> MapBasedLruCacheLib.put("a","b")
+        ...> |> MapBasedLruCacheLib.get("a")
+        ...> |> Tuple.to_list |> Enum.at(1)
+        "b"
+
+  """
   @spec put(map_based_lru_cache(), String.t(), any) :: map_based_lru_cache()
   @impl true
-  def put(map_based_lru_cache = %__MODULE__{}, key, value) do
-    # TODO: implement this
+
+  def put(
+        lru_cache = %__MODULE__{
+          size: size,
+          capacity: capacity,
+          hash_map: hash_map
+        },
+        key,
+        value
+      ) do
+    if hash_map |> Map.has_key?(key) do
+      lru_cache = lru_cache |> update_counter_parts(key)
+
+      %{
+        lru_cache
+        | hash_map: hash_map |> Map.put(key, value)
+      }
+    else
+      put_new_key(lru_cache, key, value)
+    end
   end
 
   @spec delete(map_based_lru_cache(), String.t()) :: map_based_lru_cache()
   @impl true
-  def delete(map_based_lru_cache = %__MODULE__{}, key) do
-    # TODO: implement this
+  def delete(
+        lru_cache = %__MODULE__{
+          size: size,
+          hash_map: hash_map,
+          key_counter_map: key_counter_map,
+          counter_key_map: counter_key_map
+        },
+        key
+      ) do
+    if key_counter_map |> Map.has_key?(key) do
+      counter_key_to_del = key_counter_map |> Map.get(key)
+
+      %{
+        lru_cache
+        | size: size - 1,
+          key_counter_map: key_counter_map |> Map.delete(key),
+          counter_key_map: counter_key_map |> Map.delete(counter_key_to_del),
+          hash_map: hash_map |> Map.delete(key)
+      }
+    else
+      lru_cache
+    end
   end
 
   @spec get(map_based_lru_cache(), String.t()) ::
@@ -120,9 +207,78 @@ defmodule MapBasedLruCacheLib do
   """
   @spec capacity(map_based_lru_cache()) :: integer
   @impl true
-  def capacity(map_based_lru_cache = %__MODULE__{
-    capacity: capacity
-  }) do
+  def capacity(
+        map_based_lru_cache = %__MODULE__{
+          capacity: capacity
+        }
+      ) do
     capacity
+  end
+
+  defp put_new_key(
+         lru_cache = %__MODULE__{
+           size: size,
+           capacity: capacity,
+           hash_map: hash_map
+         },
+         key,
+         value
+       )
+       when size < capacity do
+    lru_cache = lru_cache |> update_counter_parts(key)
+
+    size =
+      if hash_map |> Map.has_key?(key) do
+        size
+      else
+        size + 1
+      end
+
+    %{
+      lru_cache
+      | size: size,
+        hash_map: hash_map |> Map.put(key, value)
+    }
+  end
+
+  defp put_new_key(
+         lru_cache = %__MODULE__{
+           size: size,
+           capacity: capacity,
+           hash_map: hash_map,
+           counter_key_map: counter_key_map
+         },
+         key,
+         value
+       )
+       when size == capacity do
+    oldest_counter_in_cache = counter_key_map |> Map.keys() |> hd
+    oldest_key_in_cache = counter_key_map |> Map.get(oldest_counter_in_cache)
+    lru_cache |> delete(oldest_key_in_cache) |> put(key, value)
+  end
+
+  @spec update_counter_parts(map_based_lru_cache(), String.t()) :: map_based_lru_cache()
+  defp update_counter_parts(
+         lru_cache = %__MODULE__{
+           access_counter: access_counter,
+           counter_key_map: counter_key_map,
+           key_counter_map: key_counter_map
+         },
+         key
+       ) do
+    counter_key_map =
+      if key_counter_map |> Map.has_key?(key) do
+        old_counter = key_counter_map |> Map.get(key)
+        counter_key_map |> Map.delete(old_counter)
+      else
+        counter_key_map
+      end
+
+    %{
+      lru_cache
+      | access_counter: access_counter + 1,
+        counter_key_map: counter_key_map |> Map.put(access_counter + 1, key),
+        key_counter_map: key_counter_map |> Map.put(key, access_counter + 1)
+    }
   end
 end
