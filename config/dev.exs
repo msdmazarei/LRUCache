@@ -39,4 +39,3 @@ config :web_api, WebApi.Endpoint,
 config :web_api, WebApi.LruCache.GServer,
   cache_impl_module_name: SimpleLruCacheLib,
   cache_capacity: 6
-

@@ -10,15 +10,14 @@ defmodule WebApi.LruCache do
   end
 
   def put(key, value) do
-    GenServer.call(@pid, {:put,[key, value]})
+    GenServer.call(@pid, {:put, [key, value]})
   end
 
   def size() do
-    GenServer.call(@pid, {:size,[]})
+    GenServer.call(@pid, {:size, []})
   end
 
   def capacity() do
-    GenServer.call(@pid, {:capacity,[]})
+    GenServer.call(@pid, {:capacity, []})
   end
-
 end

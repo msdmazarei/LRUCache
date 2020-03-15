@@ -238,7 +238,7 @@ defmodule MapBasedLruCacheLib do
   """
   @spec size(map_based_lru_cache()) :: integer
   @impl true
-  def size( %__MODULE__{size: size}) do
+  def size(%__MODULE__{size: size}) do
     size
   end
 
@@ -254,11 +254,9 @@ defmodule MapBasedLruCacheLib do
   """
   @spec capacity(map_based_lru_cache()) :: integer
   @impl true
-  def capacity(
-          %__MODULE__{
-          capacity: capacity
-        }
-      ) do
+  def capacity(%__MODULE__{
+        capacity: capacity
+      }) do
     capacity
   end
 

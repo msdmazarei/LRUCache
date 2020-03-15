@@ -9,11 +9,14 @@ defmodule WebApi.Application do
     # List all child processes to be supervised
     cache_config = Application.get_env(:web_api, WebApi.LruCache.GServer)
 
-
     children = [
       # Start the endpoint when the application starts
       WebApi.Endpoint,
-      {WebApi.LruCache.GServer.Sup,%{module_name: cache_config[:cache_impl_module_name], capacity: cache_config[:cache_capacity]}}
+      {WebApi.LruCache.GServer.Sup,
+       %{
+         module_name: cache_config[:cache_impl_module_name],
+         capacity: cache_config[:cache_capacity]
+       }}
 
       # Starts a worker by calling: WebApi.Worker.start_link(arg)
       # {WebApi.Worker, arg},

@@ -5,14 +5,14 @@ defmodule WebApi.LruCacheController do
   @lru_cache_module WebApi.LruCache
 
   @doc ~S"""
-endpoints for reteriving key from cache
-example usage:
-curl -v http://localhost:4000/api/cache/a
+  endpoints for reteriving key from cache
+  example usage:
+  curl -v http://localhost:4000/api/cache/a
   """
   def get(conn, params) do
     case @lru_cache_module.get(params["key"]) do
-      {false,nil} -> conn|> put_status(404) |>json(%{})
-      {true, value}-> conn|> put_status(200)|>json(value)
+      {false, nil} -> conn |> put_status(404) |> json(%{})
+      {true, value} -> conn |> put_status(200) |> json(value)
     end
   end
 
@@ -37,6 +37,6 @@ curl -v http://localhost:4000/api/cache/a
   def delete(conn, params) do
     key = params["key"]
     @lru_cache_module.delete(key)
-    conn |> put_status(200)|>json(%{})
+    conn |> put_status(200) |> json(%{})
   end
 end

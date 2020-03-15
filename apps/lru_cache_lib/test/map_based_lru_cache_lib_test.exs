@@ -6,7 +6,6 @@ defmodule MapBasedLruCacheLibTest do
     {:ok, lru_cache: MapBasedLruCacheLib.new_instance(5), lru_cache_module: MapBasedLruCacheLib}
   end
 
-
   test "check lru-cache works for an item", state do
     lrucache = state[:lru_cache]
     lru_cache_module = state[:lru_cache_module]
